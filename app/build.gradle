@@ -1,0 +1,26 @@
+plugins {
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
+    implementation("com.codeborne:selenide:7.13.0")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    mainClass = 'test.java.ru.blugakov.qa.QaTest'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
