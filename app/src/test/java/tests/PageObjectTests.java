@@ -3,12 +3,14 @@ package tests;
 import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import com.codeborne.selenide.WebDriverRunner;
 import pages.DemoQAWelcomePage;
 import pages.YandexSearchPage;
 
+import static com.codeborne.selenide.Selenide.open;
 
 public class PageObjectTests {
 
@@ -19,6 +21,7 @@ public class PageObjectTests {
 
         @Test
         @Tag("flaky")
+        @DisplayName ("Проверить, что цена обучения — 47000 ₽")
         void mentoringPriceShouldBe47000Test() {
                 new YandexSearchPage()
                                 .openYandexSearchPage()
@@ -71,8 +74,7 @@ public class PageObjectTests {
                 String subject = "Maths";
                 String substringOfSubject = "e";
 
-                new DemoQAWelcomePage()
-                                .openDemoQA()
+                open("https://demoqa.com/", DemoQAWelcomePage.class)
                                 .openСhapterPage("Elements")
                                 .openSection("Forms")
                                 .openRequiredForm("Practice Form")

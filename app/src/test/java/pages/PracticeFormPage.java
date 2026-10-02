@@ -1,7 +1,6 @@
 package pages;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
