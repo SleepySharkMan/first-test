@@ -1,4 +1,4 @@
-package pages;
+package mentor.pages;
 
 import com.codeborne.selenide.SelenideElement;
 
@@ -10,9 +10,8 @@ public class PricePage {
 
     SelenideElement priceHolder = $$("aside h3").shouldHave(size(2)).first();
 
-    public PricePage checkPrice(String price) {
-        priceHolder.shouldHave(text("\r\n" + //
-                "₽ 47 000.00"));
+    public PricePage checkPrice(String expectedSubjects) {
+        priceHolder.shouldHave(text(expectedSubjects));
         return this;
     }
 }

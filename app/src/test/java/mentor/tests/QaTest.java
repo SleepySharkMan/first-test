@@ -1,4 +1,4 @@
-package tests;
+package mentor.tests;
 
 import java.time.Duration;
 import java.util.ArrayList;

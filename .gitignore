@@ -3,3 +3,9 @@
 
 # Ignore Gradle build output directory
 build
+
+/app/bin
+/app/build
+.vscode/
+.gradle
+*.iml

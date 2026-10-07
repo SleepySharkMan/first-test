@@ -1,4 +1,4 @@
-package pages;
+package mentor.pages;
 
 import java.time.Duration;
 

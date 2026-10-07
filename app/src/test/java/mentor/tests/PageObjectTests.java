@@ -1,4 +1,4 @@
-package tests;
+package mentor.tests;
 
 import java.util.Random;
 
@@ -7,8 +7,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import com.codeborne.selenide.WebDriverRunner;
-import pages.DemoQAWelcomePage;
-import pages.YandexSearchPage;
+import mentor.pages.DemoQAWelcomePage;
+import mentor.pages.YandexSearchPage;
 
 import static com.codeborne.selenide.Selenide.open;
 
@@ -21,7 +21,7 @@ public class PageObjectTests {
 
         @Test
         @Tag("flaky")
-        @DisplayName ("Проверить, что цена обучения — 47000 ₽")
+        @DisplayName("Проверить, что цена обучения — 47000 ₽")
         void mentoringPriceShouldBe47000Test() {
                 new YandexSearchPage()
                                 .openYandexSearchPage()
@@ -89,6 +89,6 @@ public class PageObjectTests {
                                 .checkStudentName(firstName + " " + lastName)
                                 .checkStudentNumber(userNumber)
                                 .checkStudentGender()
-                                .checkStudentSubjects(subject +", " + substringOfSubject.toUpperCase());
+                                .checkStudentSubjects(subject + ", " + substringOfSubject.toUpperCase());
         }
 }

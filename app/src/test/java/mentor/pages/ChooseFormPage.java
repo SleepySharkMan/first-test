@@ -1,4 +1,4 @@
-package pages;
+package mentor.pages;
 
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;

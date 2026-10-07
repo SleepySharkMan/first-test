@@ -1,4 +1,4 @@
-package pages;
+package mentor.pages;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -102,10 +102,10 @@ public class PracticeFormPage {
         return this;
     }
 
-    public PracticeFormPage checkStudentSubjects(String subjects) {
+    public PracticeFormPage checkStudentSubjects(String expectedSubjects) {
         resultTable
                 .findBy(text("Subjects"))
-                .shouldHave(text("subjects"));
+                .shouldHave(text(expectedSubjects));
         return this;
     }
 }
