@@ -3,14 +3,16 @@ package webshop.test;
 import static com.codeborne.selenide.Selenide.open;
 import static webshop.config.Config.WEB_SHOP_URL;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import net.datafaker.Faker;
 import webshop.pages.WSWelcomePage;
 
-public class RegistrationTest {
+public class RegistrationTest extends TestBase {
     private static final Faker faker = new Faker();
 
+    @DisplayName("Успешная регистрация нового пользователя")
     @Test
     void registrationTest() {
         String password = faker.harryPotter().character() + faker.number().positive();

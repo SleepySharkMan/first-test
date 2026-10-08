@@ -13,7 +13,7 @@ import net.datafaker.Faker;
 import webshop.pages.WSRegistrationPage;
 import webshop.pages.WSWelcomePage;
 
-public class LoginTest {
+public class LoginTest extends TestBase {
     private static final Faker faker = new Faker();
     private String email;
     private String password;
