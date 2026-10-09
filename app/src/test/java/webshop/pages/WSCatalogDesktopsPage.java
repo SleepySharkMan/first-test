@@ -4,11 +4,14 @@ import static com.codeborne.selenide.Selenide.$$;
 
 import com.codeborne.selenide.ElementsCollection;
 
+import io.qameta.allure.Step;
+
 public class WSCatalogDesktopsPage {
     private final ElementsCollection productList = $$("div.product-grid div");
 
-    public WSDesktopPage openDesktopPage(int prductIdOnPage) {
-        productList.get(1).click();
+    @Step("Открытие страницы десктопа {productIdOnPage}")
+    public WSDesktopPage openDesktopPage(int productIdOnPage) {
+        productList.get(productIdOnPage).click();
         return new WSDesktopPage();
     }
 }

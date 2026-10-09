@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.logevents.SelenideLogger;
+
+import io.qameta.allure.selenide.AllureSelenide;
 
 public class TestBase {
 
@@ -17,4 +20,8 @@ public class TestBase {
     void closeDriver() {
         Selenide.closeWebDriver();
     }
+
+    static void setUpAll() {
+    SelenideLogger.addListener("allureSelenide", new AllureSelenide());
+}
 }

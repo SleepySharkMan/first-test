@@ -4,8 +4,13 @@ import static com.codeborne.selenide.Selenide.open;
 import static webshop.config.Config.WEB_SHOP_URL;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import io.qameta.allure.Link;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import webshop.pages.WSDesktopPage;
 import webshop.pages.WSWelcomePage;
 import webshop.steps.AuthSteps;
@@ -18,6 +23,10 @@ public class CartTest extends TestBase {
         authSteps.registerNewUser();
     }
 
+    @DisplayName("Успешное добавление компьюьтера в корзину")
+    @Severity(SeverityLevel.CRITICAL)
+    @Owner("Andrey")
+    @Link(name = "#71434683", url = "https://...")
     @Test
     void addItemToCartTest() {
         int indexOfProcessor = 0; // index 0 = slow, 1 = medium, 2 = fast

@@ -7,8 +7,15 @@ import static webshop.config.Config.WEB_SHOP_REGISTRATION_URL;
 import static webshop.config.Config.WEB_SHOP_URL;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 
+import io.qameta.allure.Link;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import net.datafaker.Faker;
 import webshop.pages.WSRegistrationPage;
 import webshop.pages.WSWelcomePage;
@@ -33,6 +40,10 @@ public class LoginTest extends TestBase {
         clearBrowserLocalStorage();
     }
 
+    @DisplayName("Успешный логин нового пользователя")
+    @Severity(SeverityLevel.CRITICAL)
+    @Owner("Andrey")
+    @Link(name = "#71434683", url = "https://...")
     @Test
     void successLoginTest() {
         open(WEB_SHOP_URL, WSWelcomePage.class)
@@ -43,5 +54,20 @@ public class LoginTest extends TestBase {
                 .selectRememberMe()
                 .submitLogin()
                 .checkEmailIsShown(email);
+    }
+
+    @DisplayName("Вход с некорректным email — отображается сообщение об ошибке")
+    @Severity(SeverityLevel.CRITICAL)
+    @Owner("Andrey")
+    @Link(name = "#71434683", url = "https://...")
+    @ParameterizedTest
+    @CsvFileSource(resources = "/email.csv")
+    void invalidEmailLoginTest(String email) {
+        open(WEB_SHOP_URL, WSWelcomePage.class)
+                .openLoginPage()
+                .enterEmail(email)
+                .enterPassword(password)
+                .submitLogin()
+                .verifyErrorMessageIsShown();
     }
 }
