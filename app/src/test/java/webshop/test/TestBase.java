@@ -1,5 +1,6 @@
 package webshop.test;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -8,6 +9,7 @@ import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.logevents.SelenideLogger;
 
 import io.qameta.allure.selenide.AllureSelenide;
+import webshop.util.AttachManager;
 
 public class TestBase {
 
@@ -21,7 +23,16 @@ public class TestBase {
         Selenide.closeWebDriver();
     }
 
-    static void setUpAll() {
-    SelenideLogger.addListener("allureSelenide", new AllureSelenide());
-}
+    @BeforeAll
+    static void setUp() {
+        SelenideLogger.addListener("allureSelenide", new AllureSelenide());
+    }
+
+    @AfterEach 
+    void after() {
+        AttachManager.takeScreenshot();
+        AttachManager.pageSource();
+        AttachManager.browserConsoleLogs();
+    }
+
 }
