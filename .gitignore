@@ -10,3 +10,7 @@ build
 .gradle
 *.iml
 /app/allure-results
+app/src/test/resources/allure.properties
+.gitignore
+app/src/test/resources/config/local.properties
+.gitignore

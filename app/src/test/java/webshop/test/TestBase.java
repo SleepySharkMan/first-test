@@ -1,21 +1,60 @@
 package webshop.test;
 
+import static webshop.config.Config.getSelenoidChromeOptions;
+import static webshop.config.Config.getWebDriverConfig;
+
+import java.net.URI;
+import java.time.Duration;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.openqa.selenium.UsernameAndPassword;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.ClientConfig;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
 
 import io.qameta.allure.selenide.AllureSelenide;
+import webshop.config.WebDriverConfig;
 import webshop.util.AttachManager;
 
 public class TestBase {
 
+    private static final WebDriverConfig config = getWebDriverConfig();
+
     @BeforeAll
-    static void setup() {
-        Configuration.browserSize = "1920x1080";
+    static void setUp() {
+        SelenideLogger.addListener("AllureSelenide", new AllureSelenide());
+
+        Configuration.browserSize = config.browserSize();
+        Configuration.browser = config.browser();
+
+        if ("remote".equals(System.getProperty("run"))) {
+            Configuration.remote = "https://%s:%s@%s".formatted(config.selenoidUser(), config.selenoidPassword(),
+                    config.selenoidUser());
+            Configuration.browserCapabilities = getSelenoidChromeOptions();
+        }
+    }
+
+    @BeforeEach
+    void createRemoteDriver() {
+        if (!"remote".equals(System.getProperty("run"))) {
+            return;
+        }
+
+        ClientConfig clientConfig = ClientConfig.defaultConfig()
+                .baseUri(URI.create("https://" + config.selenoidUrl()))
+                .authenticateAs(new UsernameAndPassword(config.selenoidUser(), config.selenoidPassword()))
+                .readTimeout(Duration.ofMinutes(2));
+
+        WebDriverRunner.setWebDriver(RemoteWebDriver.builder()
+                .oneOf(getSelenoidChromeOptions())
+                .config(clientConfig)
+                .build());
     }
 
     @BeforeEach
@@ -23,16 +62,14 @@ public class TestBase {
         Selenide.closeWebDriver();
     }
 
-    @BeforeAll
-    static void setUp() {
-        SelenideLogger.addListener("allureSelenide", new AllureSelenide());
-    }
-
-    @AfterEach 
+    @AfterEach
     void after() {
         AttachManager.takeScreenshot();
         AttachManager.pageSource();
         AttachManager.browserConsoleLogs();
-    }
 
+        if ("remote".equals(config.run())) {
+            AttachManager.addVideo();
+        }
+    }
 }

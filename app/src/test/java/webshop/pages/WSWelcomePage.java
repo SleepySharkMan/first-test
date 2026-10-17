@@ -1,5 +1,6 @@
 package webshop.pages;
 
+import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
@@ -27,9 +28,9 @@ public class WSWelcomePage {
         return new WSLoginPage();
     }
 
-    @Step("Наведение курсора на пункт меню по ID {menuItemId}")
-    public WSWelcomePage hoverCursorOnMenuItemById(int menuItemId) {
-        headerMenuList.get(menuItemId).hover();
+    @Step("Наведение курсора на пункт меню по названию {itemName}")
+    public WSWelcomePage hoverMenuItem(String itemName) {
+        headerMenuList.findBy(exactText(itemName)).hover();
         return this;
     }
 

@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'io.qameta.allure' version "3.0.1"
+    id 'io.qameta.allure' version "3.1.0"
 }
 
 def allureVersion = "2.32.0"
@@ -30,6 +30,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("net.datafaker:datafaker:2.5.3")
+    testImplementation 'org.aeonbits.owner:owner:1.0.12'
 }
 java {
     toolchain {
@@ -39,6 +40,7 @@ java {
 
 test {
     useJUnitPlatform()
+    systemProperty 'run', providers.systemProperty('run').getOrElse('local')
 }
 
 tasks.withType(JavaCompile).configureEach {
