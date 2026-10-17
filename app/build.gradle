@@ -55,6 +55,10 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 task uiTest(type: Test) {
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    dependsOn testClasses
+
     useJUnitPlatform {
         def tag = System.getProperty("tag")
         if (tag != null && !tag.isBlank()) {
