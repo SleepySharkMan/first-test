@@ -59,12 +59,21 @@ task uiTest(type: Test) {
     classpath = sourceSets.test.runtimeClasspath
     dependsOn testClasses
 
+    systemProperty 'run', providers.systemProperty('run').getOrElse('local')
+
+    ['selenoidUrl', 'selenoidUser', 'selenoidPassword', 'browserVersion', 'enableVNC'].each { propertyName ->
+        def propertyValue = providers.systemProperty(propertyName).orNull
+        if (propertyValue != null) {
+            systemProperty propertyName, propertyValue
+        }
+    }
+
     useJUnitPlatform {
-        def tag = System.getProperty("tag")
+        def tag = System.getProperty('tag')
         if (tag != null && !tag.isBlank()) {
             includeTags("UI & ${tag}")
         } else {
-            includeTags("UI")
+            includeTags('UI')
         }
     }
 }
