@@ -1,5 +1,18 @@
 package mentor.tests;
 
+import static com.codeborne.selenide.CollectionCondition.size;
+import static com.codeborne.selenide.Condition.anyOf;
+import static com.codeborne.selenide.Condition.clickable;
+import static com.codeborne.selenide.Condition.selected;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byText;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.$x;
+import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.switchTo;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Random;
@@ -7,25 +20,10 @@ import java.util.Random;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
-
-import static com.codeborne.selenide.Selenide.open;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
-import static com.codeborne.selenide.Selenide.$x;
-import static com.codeborne.selenide.Selenide.switchTo;
-
-import static com.codeborne.selenide.Selectors.byText;
-
-import static com.codeborne.selenide.Condition.anyOf;
-import static com.codeborne.selenide.Condition.clickable;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Condition.selected;
-
-import static com.codeborne.selenide.CollectionCondition.size;
 
 public class QaTest {
 

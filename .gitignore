@@ -9,3 +9,5 @@ build
 .vscode/
 .gradle
 *.iml
+/app/allure-results
+app/src/test/resources/allure.properties
