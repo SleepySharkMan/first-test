@@ -41,23 +41,17 @@ java {
 test {
     useJUnitPlatform()
     systemProperty 'run', providers.systemProperty('run').getOrElse('local')
+
+    ['selenoidUser', 'selenoidPassword'].each { propertyName ->
+        def propertyValue = providers.systemProperty(propertyName).orNull
+        if (propertyValue != null) {
+            systemProperty propertyName, propertyValue
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-tasks.withType(Test).configureEach {
-    useJUnitPlatform()
-    
-    // 1. Передаем ВСЕ системные свойства, которые вы указаны в команде (-D)
-    systemProperties(System.getProperties())
-    
-    // 2. Если запускаем удаленно, принудительно включаем Selenoid для Selenide
-    if (System.getProperty('run') == 'remote') {
-        def remoteUrl = "https://" + System.getProperty('selenoidUrl')
-        systemProperty 'selenide.remote', remoteUrl
-    }
 }
 
 task uiTest(type: Test) {
