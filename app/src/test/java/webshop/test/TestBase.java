@@ -32,12 +32,6 @@ public class TestBase {
 
         Configuration.browserSize = config.browserSize();
         Configuration.browser = config.browser();
-
-        if ("remote".equals(System.getProperty("run"))) {
-            Configuration.remote = "https://%s:%s@%s".formatted(config.selenoidUser(), config.selenoidPassword(),
-                    config.selenoidUser());
-            Configuration.browserCapabilities = getSelenoidChromeOptions();
-        }
     }
 
     @BeforeEach
@@ -48,7 +42,7 @@ public class TestBase {
 
         ClientConfig clientConfig = ClientConfig.defaultConfig()
                 .baseUri(URI.create("https://" + config.selenoidUrl()))
-                .authenticateAs(new UsernameAndPassword(config.selenoidUser(), config.selenoidPassword()))
+                .authenticateAs(new UsernameAndPassword(System.getProperty("selenoidUser"), System.getProperty("selenoidPassword")))
                 .readTimeout(Duration.ofMinutes(2));
 
         WebDriverRunner.setWebDriver(RemoteWebDriver.builder()
