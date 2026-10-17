@@ -46,3 +46,31 @@ test {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
+
+task uiTest(type: Test) {
+    useJUnitPlatform {
+        def tag = System.getProperty("tag")
+        // если тэг указан - запускаем ui + тэг тест
+        // если нет - только ui
+        if (tag != null && !tag.isBlank()) {
+            includeTags("UI & ${tag}")
+        } else {
+            includeTags("UI")
+        }
+    }
+    systemProperties(System.getProperties())
+}
+
+task apiTest(type: Test) {
+    useJUnitPlatform {
+        def tag = System.getProperty("tag")
+        // если тэг указан - запускаем ui + тэг тест
+        // если нет - только ui
+        if (tag != null && !tag.isBlank()) {
+            includeTags("API & ${tag}")
+        } else {
+            includeTags("API")
+        }
+    }
+    systemProperties(System.getProperties())
+}

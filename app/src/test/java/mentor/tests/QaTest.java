@@ -10,6 +10,7 @@ import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.$x;
+import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.Selenide.switchTo;
 
@@ -23,13 +24,12 @@ import org.junit.jupiter.api.Test;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.SelenideElement;
-import com.codeborne.selenide.WebDriverRunner;
 
 public class QaTest {
 
         @AfterEach
         public void tearDown() {
-                WebDriverRunner.closeWebDriver();
+                closeWebDriver();
         }
 
         @Test
