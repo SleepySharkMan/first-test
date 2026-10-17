@@ -41,6 +41,7 @@ public class LoginTest extends TestBase {
         clearBrowserLocalStorage();
     }
 
+    @Tag("UI")
     @Tag("positive")
     @DisplayName("Успешный логин нового пользователя")
     @Severity(SeverityLevel.CRITICAL)
@@ -58,6 +59,7 @@ public class LoginTest extends TestBase {
                 .checkEmailIsShown(email);
     }
 
+    @Tag("UI")
     @Tag("negative")
     @DisplayName("Вход с некорректным email — отображается сообщение об ошибке")
     @Severity(SeverityLevel.CRITICAL)
