@@ -8,6 +8,7 @@ import static webshop.config.Config.WEB_SHOP_URL;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
@@ -40,6 +41,7 @@ public class LoginTest extends TestBase {
         clearBrowserLocalStorage();
     }
 
+    @Tag("positive")
     @DisplayName("Успешный логин нового пользователя")
     @Severity(SeverityLevel.CRITICAL)
     @Owner("Andrey")
@@ -56,6 +58,7 @@ public class LoginTest extends TestBase {
                 .checkEmailIsShown(email);
     }
 
+    @Tag("negative")
     @DisplayName("Вход с некорректным email — отображается сообщение об ошибке")
     @Severity(SeverityLevel.CRITICAL)
     @Owner("Andrey")

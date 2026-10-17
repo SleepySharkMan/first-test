@@ -4,6 +4,7 @@ import static com.codeborne.selenide.Selenide.open;
 import static webshop.config.Config.WEB_SHOP_URL;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import io.qameta.allure.Epic;
@@ -20,6 +21,7 @@ import webshop.pages.WSWelcomePage;
 public class RegistrationTest extends TestBase {
     private static final Faker faker = new Faker();
 
+    @Tag("positive")
     @DisplayName("Успешная регистрация нового пользователя")
     @Severity(SeverityLevel.CRITICAL)
     @Owner("Andrey")

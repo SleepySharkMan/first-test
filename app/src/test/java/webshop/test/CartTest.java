@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import io.qameta.allure.Link;
@@ -30,6 +31,7 @@ public class CartTest extends TestBase {
         authSteps.registerNewUser();
     }
 
+    @Tag("positive")
     @DisplayName("Успешное добавление компьюьтера в корзину")
     @Severity(SeverityLevel.CRITICAL)
     @Owner("Andrey")
