@@ -11,5 +11,3 @@ build
 *.iml
 /app/allure-results
 app/src/test/resources/allure.properties
-app/src/test/resources/config/local.properties
-app/src/test/resources/config/remote.properties
