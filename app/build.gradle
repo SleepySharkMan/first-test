@@ -47,30 +47,37 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    
+    // 1. Передаем ВСЕ системные свойства, которые вы указаны в команде (-D)
+    systemProperties(System.getProperties())
+    
+    // 2. Если запускаем удаленно, принудительно включаем Selenoid для Selenide
+    if (System.getProperty('run') == 'remote') {
+        def remoteUrl = "https://" + System.getProperty('selenoidUrl')
+        systemProperty 'selenide.remote', remoteUrl
+    }
+}
+
 task uiTest(type: Test) {
     useJUnitPlatform {
         def tag = System.getProperty("tag")
-        // если тэг указан - запускаем ui + тэг тест
-        // если нет - только ui
         if (tag != null && !tag.isBlank()) {
             includeTags("UI & ${tag}")
         } else {
             includeTags("UI")
         }
     }
-    systemProperties(System.getProperties())
 }
 
 task apiTest(type: Test) {
     useJUnitPlatform {
         def tag = System.getProperty("tag")
-        // если тэг указан - запускаем ui + тэг тест
-        // если нет - только ui
         if (tag != null && !tag.isBlank()) {
             includeTags("API & ${tag}")
         } else {
             includeTags("API")
         }
     }
-    systemProperties(System.getProperties())
 }
