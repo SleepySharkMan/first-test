@@ -14,7 +14,7 @@ allure {
         version.set(allureVersion)
     }
     adapter {
-        aspectjWeaver.set(true)
+        aspectjWeaver.set(false)
         frameworks {
             junit5 {
                 adapterVersion.set(allureVersion)
