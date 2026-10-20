@@ -31,6 +31,7 @@ public class CartTest extends TestBase {
         authSteps.registerNewUser();
     }
 
+    @Tag("UI")
     @Tag("positive")
     @DisplayName("Успешное добавление компьюьтера в корзину")
     @Severity(SeverityLevel.CRITICAL)

@@ -21,6 +21,7 @@ import webshop.pages.WSWelcomePage;
 public class RegistrationTest extends TestBase {
     private static final Faker faker = new Faker();
 
+    @Tag("UI")
     @Tag("positive")
     @DisplayName("Успешная регистрация нового пользователя")
     @Severity(SeverityLevel.CRITICAL)

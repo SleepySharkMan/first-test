@@ -24,14 +24,20 @@ allure {
 }
 
 dependencies {
-    testImplementation ("io.qameta.allure:allure-junit5:${allureVersion}")
-    testImplementation ("io.qameta.allure:allure-selenide:${allureVersion}")
-    testImplementation("com.codeborne:selenide:7.13.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("net.datafaker:datafaker:2.5.3")
+    testCompileOnly 'org.projectlombok:lombok:1.18.48'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.48'
+    testImplementation "io.qameta.allure:allure-junit5:$allureVersion"
+    testImplementation "io.qameta.allure:allure-selenide:$allureVersion"
+    testImplementation "io.qameta.allure:allure-rest-assured:$allureVersion"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'com.codeborne:selenide:7.13.0'
+    testImplementation 'net.datafaker:datafaker:2.5.3'
     testImplementation 'org.aeonbits.owner:owner:1.0.12'
+    testImplementation 'io.rest-assured:rest-assured:6.0.0'
+    testImplementation 'tools.jackson.core:jackson-databind:3.0.3'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
 }
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -41,8 +47,50 @@ java {
 test {
     useJUnitPlatform()
     systemProperty 'run', providers.systemProperty('run').getOrElse('local')
+
+    ['selenoidUser', 'selenoidPassword'].each { propertyName ->
+        def propertyValue = providers.systemProperty(propertyName).orNull
+        if (propertyValue != null) {
+            systemProperty propertyName, propertyValue
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+task uiTest(type: Test) {
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    dependsOn testClasses
+
+    systemProperty 'run', providers.systemProperty('run').getOrElse('local')
+
+    ['selenoidUrl', 'selenoidUser', 'selenoidPassword', 'browserVersion', 'enableVNC'].each { propertyName ->
+        def propertyValue = providers.systemProperty(propertyName).orNull
+        if (propertyValue != null) {
+            systemProperty propertyName, propertyValue
+        }
+    }
+
+    useJUnitPlatform {
+        def tag = System.getProperty('tag')
+        if (tag != null && !tag.isBlank()) {
+            includeTags("UI & ${tag}")
+        } else {
+            includeTags('UI')
+        }
+    }
+}
+
+task apiTest(type: Test) {
+    useJUnitPlatform {
+        def tag = System.getProperty("tag")
+        if (tag != null && !tag.isBlank()) {
+            includeTags("API & ${tag}")
+        } else {
+            includeTags("API")
+        }
+    }
 }

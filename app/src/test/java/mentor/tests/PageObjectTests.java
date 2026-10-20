@@ -1,22 +1,23 @@
 package mentor.tests;
 
+import static com.codeborne.selenide.Selenide.closeWebDriver;
+import static com.codeborne.selenide.Selenide.open;
+
 import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import com.codeborne.selenide.WebDriverRunner;
+
 import mentor.pages.DemoQAWelcomePage;
 import mentor.pages.YandexSearchPage;
-
-import static com.codeborne.selenide.Selenide.open;
 
 public class PageObjectTests {
 
         @AfterEach
         public void tearDown() {
-                WebDriverRunner.closeWebDriver();
+                closeWebDriver();
         }
 
         @Test

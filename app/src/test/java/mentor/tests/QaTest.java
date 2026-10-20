@@ -10,6 +10,7 @@ import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.$x;
+import static com.codeborne.selenide.Selenide.closeWebDriver;
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.Selenide.switchTo;
 
@@ -23,20 +24,18 @@ import org.junit.jupiter.api.Test;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.SelenideElement;
-import com.codeborne.selenide.WebDriverRunner;
 
 public class QaTest {
 
         @AfterEach
         public void tearDown() {
-                WebDriverRunner.closeWebDriver();
+                closeWebDriver();
         }
 
         @Test
         @Tag("flaky")
         void mentoringPriceShouldBe47000Test() {
                 Configuration.browser = "chrome";
-                Configuration.holdBrowserOpen = true;
                 open("https://ya.ru");
                 SelenideElement searchInput = $("#text");
                 searchInput.setValue("blugakov qa");
@@ -97,7 +96,6 @@ public class QaTest {
                 String userNumber = Long.toString(new Random().nextLong(1000000000L, 9999999999L));
 
                 Configuration.browser = "chrome";
-                Configuration.holdBrowserOpen = true;
                 open("https://demoqa.com/");
                 $(byText("Elements")).scrollTo().click();
                 $$(".element-group").get(1).click();
