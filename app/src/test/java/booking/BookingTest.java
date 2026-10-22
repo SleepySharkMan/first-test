@@ -22,8 +22,6 @@ import booking.dto.BookingApiClient;
 import booking.dto.BookingDTO;
 import booking.dto.CreateBookingResponse;
 import booking.steps.BookingSteps;
-import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -40,8 +38,7 @@ public class BookingTest extends BaseApiTest {
 
         @Test
         @Tag("positive")
-        @Description("Auth test")
-        @Step("Авторизация с корректными учетными данными")
+        @DisplayName("Авторизация с корректными учетными данными")
         void authTest() {
                 Response resp = bookingApiClient.auth(CFG.username(), CFG.password());
 
@@ -49,11 +46,10 @@ public class BookingTest extends BaseApiTest {
                 assertThat(resp.as(AuthResponse.class).getToken()).isNotNull();
         }
 
-        @ParameterizedTest
+        @ParameterizedTest(name = "Авторизация с некорректными учетными данными: {0}, {1}")
         @Tag("negative")
-        @Description("Авторизация с некорректными учетными данными")
         @CsvFileSource(resources = "/wrong_credentials.csv", numLinesToSkip = 1)
-        @Step("Авторизация с некорректными учетными данными: {username}, {password}")
+        @DisplayName("Авторизация с некорректными учетными данными")
         void authWrongCredentialsTest(String username, String password) {
                 Response resp = bookingApiClient.auth(username, password);
 
@@ -63,9 +59,10 @@ public class BookingTest extends BaseApiTest {
 
         @Test
         @Tag("negative")
-        @Step("Авторизация с пустым телом запроса")
+        @DisplayName("Авторизация с пустым телом запроса")
         void authWithEmptyBody() {
                 AuthResponse resp = given()
+                                .spec(requestSpec)
                                 .body("{}")
                                 .when()
                                 .post(CFG.bookingUrl() + "/auth")
@@ -78,9 +75,10 @@ public class BookingTest extends BaseApiTest {
 
         @Test
         @Tag("negative")
-        @Step("Авторизация без тела запроса")
-        void authWithoutyBodyTest() {
+        @DisplayName("Авторизация без тела запроса")
+        void authWithoutBodyTest() {
                 AuthResponse resp = given()
+                                .spec(requestSpec)
                                 .when()
                                 .post(CFG.bookingUrl() + "/auth")
                                 .then()
@@ -92,8 +90,7 @@ public class BookingTest extends BaseApiTest {
 
         @Test
         @Tag("positive")
-        @Description("Create booking test")
-        @Step("Создание бронирования")
+        @DisplayName("Создание бронирования")
         void createTest() {
                 Response resp = bookingApiClient.createBooking(buildBookingRequest());
                 assertThat(resp.statusCode()).isEqualTo(200);
@@ -105,7 +102,7 @@ public class BookingTest extends BaseApiTest {
                                 () -> assertThat(createBookingResponse.getBooking()).isNotNull());
         }
 
-        @ParameterizedTest(name = "{0}")
+        @ParameterizedTest
         @MethodSource("missingRequiredFields")
         @Tag("negative")
         @DisplayName("Создание бронирования без имени/фамилии")
@@ -126,27 +123,20 @@ public class BookingTest extends BaseApiTest {
         @Tag("negative")
         @DisplayName("Создание бронирования с отрицательной стоимостью")
         void createBookingWithNegativeTotalPriceTest() {
-                Response res = bookingApiClient.createBooking(BookingDTO.builder()
-                                .firstname("Ivan")
-                                .lastname("Ivanov")
-                                .totalprice(-500)
-                                .depositpaid(false)
-                                .bookingdates(BookingDTO.BookingDates.builder()
-                                                .checkin("2026-01-01")
-                                                .checkout("2027-01-01")
-                                                .build())
-                                .additionalneeds("Newspaper")
-                                .build());
+                Response res = bookingApiClient.createBooking(
+                                validBookingBuilder().totalprice(-500).build());
 
+                assertThat(res.getStatusCode()).isEqualTo(200);
+                CreateBookingResponse createBookingResponse = res.as(CreateBookingResponse.class);
                 assertAll(
-                                () -> assertThat(res.getStatusCode()).isEqualTo(200),
-                                () -> assertThat(res.as(CreateBookingResponse.class).getBookingid()).isNotNull(),
-                                () -> assertThat(res.as(CreateBookingResponse.class).getBooking().getTotalprice())
+                                () -> assertThat(createBookingResponse.getBookingid()).isNotNull(),
+                                () -> assertThat(createBookingResponse.getBooking().getTotalprice())
                                                 .isEqualTo(-500));
         }
 
         @Test
         @Tag("positive")
+        @DisplayName("Обновление бронирования")
         void updateBookingTest() {
                 Response createResp = bookingApiClient.createBooking(
                                 buildBookingRequest());
@@ -164,7 +154,7 @@ public class BookingTest extends BaseApiTest {
 
         @Test
         @Tag("positive")
-        @Step("Частичное обновление бронирования")
+        @DisplayName("Частичное обновление бронирования")
         void partialUpdateBookingTest() {
                 Response createResp = bookingApiClient.createBooking(buildBookingRequest());
                 assertThat(createResp.getStatusCode()).isEqualTo(200);
@@ -190,7 +180,7 @@ public class BookingTest extends BaseApiTest {
 
         @Test
         @Tag("positive")
-        @Step("Удаление бронирования")
+        @DisplayName("Удаление бронирования")
         void deleteBookingTest() {
                 Response createResp = bookingApiClient.createBooking(buildBookingRequest());
                 assertThat(createResp.getStatusCode()).isEqualTo(200);
@@ -203,35 +193,25 @@ public class BookingTest extends BaseApiTest {
                 assertThat(getResponse.getStatusCode()).isEqualTo(404);
         }
 
+        private static BookingDTO.BookingDTOBuilder validBookingBuilder() {
+                return BookingDTO.builder()
+                                .firstname("Ivan")
+                                .lastname("Ivanov")
+                                .totalprice(1000)
+                                .depositpaid(false)
+                                .bookingdates(BookingDTO.BookingDates.builder()
+                                                .checkin("2026-01-01")
+                                                .checkout("2027-01-01")
+                                                .build())
+                                .additionalneeds("Newspaper");
+        }
+
         private static Stream<Arguments> missingRequiredFields() {
                 return Stream.of(
                                 Arguments.of(
-                                                "Отсутствует firstname",
-                                                BookingDTO.builder()
-                                                                .firstname(null)
-                                                                .lastname("Ivanov")
-                                                                .totalprice(1000)
-                                                                .depositpaid(false)
-                                                                .bookingdates(BookingDTO.BookingDates.builder()
-                                                                                .checkin("2026-01-01")
-                                                                                .checkout("2027-01-01")
-                                                                                .build())
-                                                                .additionalneeds("Newspaper")
-                                                                .build(),
-                                                Arguments.of(
-                                                                "Отсутствует lastname",
-                                                                BookingDTO.builder()
-                                                                                .firstname("Ivan")
-                                                                                .lastname(null)
-                                                                                .totalprice(1000)
-                                                                                .depositpaid(false)
-                                                                                .bookingdates(BookingDTO.BookingDates
-                                                                                                .builder()
-                                                                                                .checkin("2026-01-01")
-                                                                                                .checkout("2027-01-01")
-                                                                                                .build())
-                                                                                .additionalneeds("Newspaper")
-                                                                                .build())));
+                                                validBookingBuilder().firstname(null).build()),
+                                Arguments.of(
+                                                validBookingBuilder().lastname(null).build()));
         }
 
 }

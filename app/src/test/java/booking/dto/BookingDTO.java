@@ -2,7 +2,6 @@ package booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import groovy.transform.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@EqualsAndHashCode
 public class BookingDTO {
     private String firstname;
     private String lastname;
