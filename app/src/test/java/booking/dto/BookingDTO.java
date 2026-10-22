@@ -2,6 +2,7 @@ package booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import groovy.transform.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CreateBookingDto {
+@EqualsAndHashCode
+public class BookingDTO {
     private String firstname;
     private String lastname;
     private Integer totalprice;
@@ -27,5 +29,12 @@ public class CreateBookingDto {
     public static class BookingDates {
         private String checkin;
         private String checkout;
+    }
+
+    public BookingDTO(String firstname, int totalprice, String checkin) {
+        this.firstname = firstname;
+        this.totalprice = totalprice;
+        this.bookingdates = new BookingDates();
+        this.bookingdates.setCheckin(checkin);
     }
 }
