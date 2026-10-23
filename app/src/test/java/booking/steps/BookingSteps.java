@@ -1,47 +1,68 @@
 package booking.steps;
 
+import static io.qameta.allure.Allure.step;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import booking.dto.BookingApiClient;
 import booking.dto.BookingDTO;
+import booking.dto.BookingId;
+import booking.dto.CreateBookingResponse;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
 import net.datafaker.Faker;
 
 public class BookingSteps {
 
-    private static final Faker faker = new Faker();
+        private BookingApiClient bookingApiClient = new BookingApiClient();
+        private static final Faker faker = new Faker();
 
-    @Step("Проверка, что данные бронирования совпадают с ожидаемыми")
-    public static void bookingsShouldBeEqual(BookingDTO expected, BookingDTO actual) {
-        assertAll(
-                () -> assertThat(actual.getFirstname())
-                        .as("firstname отличается от ожидаемого")
-                        .isEqualTo(expected.getFirstname()),
-                () -> assertThat(actual.getLastname())
-                        .as("lastName отличается от ожидаемого")
-                        .isEqualTo(expected.getLastname()),
-                () -> assertThat(actual.getTotalprice())
-                        .as("totalPrice отличается от ожидаемого")
-                        .isEqualTo(expected.getTotalprice()),
-                () -> assertThat(actual.getDepositpaid())
-                        .as("depositpaid отличается от ожидаемого")
-                        .isEqualTo(expected.getDepositpaid()),
-                () -> assertThat(actual.getAdditionalneeds())
-                        .as("additionalNeeds отличается от ожидаемого")
-                        .isEqualTo(expected.getAdditionalneeds()),
-                () -> assertThat(actual.getBookingdates())
-                        .as("bookingdates равен null")
-                        .isNotNull(),
-                () -> assertThat(actual.getBookingdates().getCheckin())
-                        .as("checkin отличается от ожидаемого")
-                        .isEqualTo(expected.getBookingdates().getCheckin()),
-                () -> assertThat(actual.getBookingdates().getCheckout())
-                        .as("checkout отличается от ожидаемого")
-                        .isEqualTo(expected.getBookingdates().getCheckout()));
-    }
+        @Step("Проверка, что данные бронирования совпадают с ожидаемыми")
+        public static void bookingsShouldBeEqual(BookingDTO expected, BookingDTO actual) {
+                assertAll(
+                                () -> assertThat(actual.getFirstname())
+                                                .as("firstname отличается от ожидаемого")
+                                                .isEqualTo(expected.getFirstname()),
+                                () -> assertThat(actual.getLastname())
+                                                .as("lastName отличается от ожидаемого")
+                                                .isEqualTo(expected.getLastname()),
+                                () -> assertThat(actual.getTotalprice())
+                                                .as("totalPrice отличается от ожидаемого")
+                                                .isEqualTo(expected.getTotalprice()),
+                                () -> assertThat(actual.getDepositpaid())
+                                                .as("depositpaid отличается от ожидаемого")
+                                                .isEqualTo(expected.getDepositpaid()),
+                                () -> assertThat(actual.getAdditionalneeds())
+                                                .as("additionalNeeds отличается от ожидаемого")
+                                                .isEqualTo(expected.getAdditionalneeds()),
+                                () -> assertThat(actual.getBookingdates())
+                                                .as("bookingdates равен null")
+                                                .isNotNull(),
+                                () -> assertThat(actual.getBookingdates().getCheckin())
+                                                .as("checkin отличается от ожидаемого")
+                                                .isEqualTo(expected.getBookingdates().getCheckin()),
+                                () -> assertThat(actual.getBookingdates().getCheckout())
+                                                .as("checkout отличается от ожидаемого")
+                                                .isEqualTo(expected.getBookingdates().getCheckout()));
+        }
 
-    @Step("Создание объекта BookingDTO с рандомными данными")
-    public static BookingDTO buildBookingRequest() {
+        @Step("Проверить список бронирований")
+        public static void bookingListShouldBeValid(BookingId[] bookings, Integer[] expectedBookingIds,
+                        Integer bookingQuantity) {
+                assertThat(bookings)
+                                .as("Количество бронирований")
+                                .hasSize(bookingQuantity)
+                                .as("Список бронирований не должен содержать null")
+                                .doesNotContainNull()
+                                .as("Список бронирований не должен содержать дубликаты")
+                                .doesNotHaveDuplicates()
+                                .extracting(booking -> booking.bookingid())
+                                .as("ID бронирований должны совпадать с ожидаемыми")
+                                .containsExactlyInAnyOrder(expectedBookingIds);
+        }
+
+        @Step("Создание объекта BookingDTO с рандомными данными")
+        public static BookingDTO randomBooking() {
                 return BookingDTO.builder()
                                 .firstname(faker.name().firstName())
                                 .lastname(faker.name().lastName())
@@ -53,5 +74,19 @@ public class BookingSteps {
                                                 .build())
                                 .additionalneeds(faker.food().fruit())
                                 .build();
+        }
+
+        @Step("Создание бронирования с переданными данными")
+        public CreateBookingResponse createBooking(BookingDTO booking) {
+                Response createResp = bookingApiClient.createBooking(booking);
+                step("Проверить, что статус код = 200",
+                                () -> assertThat(createResp.getStatusCode()).isEqualTo(200));
+
+                return createResp.as(CreateBookingResponse.class);
+        }
+
+        @Step("Создание бронирования с рандомными данными")
+        public CreateBookingResponse createBooking() {
+                return createBooking(randomBooking());
         }
 }

@@ -1,11 +1,12 @@
 package booking;
 
 import static booking.config.BookingApiConfig.getBookingConfig;
-import static booking.steps.BookingSteps.buildBookingRequest;
-import static io.restassured.RestAssured.given;
+import static booking.steps.BookingSteps.randomBooking;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -20,26 +21,22 @@ import booking.config.BookingConfig;
 import booking.dto.AuthResponse;
 import booking.dto.BookingApiClient;
 import booking.dto.BookingDTO;
+import booking.dto.BookingId;
 import booking.dto.CreateBookingResponse;
 import booking.steps.BookingSteps;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import net.datafaker.Faker;
 
 public class BookingTest extends BaseApiTest {
         private static final BookingConfig CFG = getBookingConfig();
         private static final Faker faker = new Faker();
         private BookingApiClient bookingApiClient = new BookingApiClient();
-        RequestSpecification requestSpec = new RequestSpecBuilder()
-                        .setContentType(ContentType.JSON)
-                        .build();
+        private BookingSteps bookingSteps = new BookingSteps();
 
         @Test
         @Tag("positive")
         @DisplayName("Авторизация с корректными учетными данными")
-        void authTest() {
+        void auth() {
                 Response resp = bookingApiClient.auth(CFG.username(), CFG.password());
 
                 assertThat(resp.statusCode()).isEqualTo(200);
@@ -61,38 +58,27 @@ public class BookingTest extends BaseApiTest {
         @Tag("negative")
         @DisplayName("Авторизация с пустым телом запроса")
         void authWithEmptyBody() {
-                AuthResponse resp = given()
-                                .spec(requestSpec)
-                                .body("{}")
-                                .when()
-                                .post(CFG.bookingUrl() + "/auth")
-                                .then()
-                                .statusCode(200) // Strangely, the API returns 200 for wrong credentials
-                                .extract().as(AuthResponse.class);
+                Response response = bookingApiClient.authWithEmptyBody();
+                assertThat(response.statusCode()).isEqualTo(200);
 
-                assertThat(resp.getToken()).isNull();
+                assertThat(response.as(AuthResponse.class).getToken()).isNull();
         }
 
         @Test
         @Tag("negative")
         @DisplayName("Авторизация без тела запроса")
-        void authWithoutBodyTest() {
-                AuthResponse resp = given()
-                                .spec(requestSpec)
-                                .when()
-                                .post(CFG.bookingUrl() + "/auth")
-                                .then()
-                                .statusCode(200) // Strangely, the API returns 200 for wrong credentials
-                                .extract().as(AuthResponse.class);
+        void authWithoutBody() {
+                Response response = bookingApiClient.authWithoutBody();
+                assertThat(response.statusCode()).isEqualTo(200);
 
-                assertThat(resp.getToken()).isNull();
+                assertThat(response.as(AuthResponse.class).getToken()).isNull();
         }
 
         @Test
         @Tag("positive")
         @DisplayName("Создание бронирования")
-        void createTest() {
-                Response resp = bookingApiClient.createBooking(buildBookingRequest());
+        void createBooking() {
+                Response resp = bookingApiClient.createBooking(randomBooking());
                 assertThat(resp.statusCode()).isEqualTo(200);
 
                 CreateBookingResponse createBookingResponse = resp.as(CreateBookingResponse.class);
@@ -105,7 +91,7 @@ public class BookingTest extends BaseApiTest {
         @ParameterizedTest
         @MethodSource("missingRequiredFields")
         @Tag("negative")
-        @DisplayName("Создание бронирования без имени/фамилии")
+        @DisplayName("Создание бронирования с некорректными данными (отсутствует имя, фамилия)")
         void createBookingWithoutRequiredFieldsTest(
                         BookingDTO bookingDTO) {
                 Response response = bookingApiClient.createBooking(bookingDTO);
@@ -122,9 +108,10 @@ public class BookingTest extends BaseApiTest {
         @Test
         @Tag("negative")
         @DisplayName("Создание бронирования с отрицательной стоимостью")
-        void createBookingWithNegativeTotalPriceTest() {
-                Response res = bookingApiClient.createBooking(
-                                validBookingBuilder().totalprice(-500).build());
+        void createBookingWithNegativeTotalPrice() {
+                BookingDTO bookingDTO = randomBooking();
+                bookingDTO.setTotalprice(-500);
+                Response res = bookingApiClient.createBooking(bookingDTO);
 
                 assertThat(res.getStatusCode()).isEqualTo(200);
                 CreateBookingResponse createBookingResponse = res.as(CreateBookingResponse.class);
@@ -137,14 +124,12 @@ public class BookingTest extends BaseApiTest {
         @Test
         @Tag("positive")
         @DisplayName("Обновление бронирования")
-        void updateBookingTest() {
-                Response createResp = bookingApiClient.createBooking(
-                                buildBookingRequest());
-                assertThat(createResp.getStatusCode()).isEqualTo(200);
+        void updateBooking() {
+                CreateBookingResponse createBookingResponse = bookingSteps.createBooking();
 
-                BookingDTO bookingDTO = buildBookingRequest();
+                BookingDTO bookingDTO = randomBooking();
                 Response updateResponse = bookingApiClient.updateBooking(bookingDTO,
-                                createResp.as(CreateBookingResponse.class).getBookingid());
+                                createBookingResponse.getBookingid());
 
                 assertThat(updateResponse.getStatusCode()).isEqualTo(200);
 
@@ -155,9 +140,8 @@ public class BookingTest extends BaseApiTest {
         @Test
         @Tag("positive")
         @DisplayName("Частичное обновление бронирования")
-        void partialUpdateBookingTest() {
-                Response createResp = bookingApiClient.createBooking(buildBookingRequest());
-                assertThat(createResp.getStatusCode()).isEqualTo(200);
+        void partialUpdateBooking() {
+                CreateBookingResponse createBookingResponse = bookingSteps.createBooking();
 
                 BookingDTO bookingDTO = new BookingDTO(
                                 faker.football().players(),
@@ -166,7 +150,7 @@ public class BookingTest extends BaseApiTest {
 
                 Response updateResponse = bookingApiClient
                                 .partialUpdateBooking(bookingDTO,
-                                                createResp.as(CreateBookingResponse.class).getBookingid());
+                                                createBookingResponse.getBookingid());
                 assertThat(updateResponse.getStatusCode()).isEqualTo(200);
 
                 BookingDTO updatedBookingDto = updateResponse.as(BookingDTO.class);
@@ -181,11 +165,8 @@ public class BookingTest extends BaseApiTest {
         @Test
         @Tag("positive")
         @DisplayName("Удаление бронирования")
-        void deleteBookingTest() {
-                Response createResp = bookingApiClient.createBooking(buildBookingRequest());
-                assertThat(createResp.getStatusCode()).isEqualTo(200);
-
-                Integer bookingId = createResp.as(CreateBookingResponse.class).getBookingid();
+        void deleteBooking() {
+                Integer bookingId = bookingSteps.createBooking().getBookingid();
                 Response deleteResponse = bookingApiClient.deleteBooking(bookingId);
                 assertThat(deleteResponse.getStatusCode()).isEqualTo(201);
 
@@ -193,25 +174,67 @@ public class BookingTest extends BaseApiTest {
                 assertThat(getResponse.getStatusCode()).isEqualTo(404);
         }
 
-        private static BookingDTO.BookingDTOBuilder validBookingBuilder() {
-                return BookingDTO.builder()
-                                .firstname("Ivan")
-                                .lastname("Ivanov")
-                                .totalprice(1000)
-                                .depositpaid(false)
-                                .bookingdates(BookingDTO.BookingDates.builder()
-                                                .checkin("2026-01-01")
-                                                .checkout("2027-01-01")
-                                                .build())
-                                .additionalneeds("Newspaper");
+        @Test
+        @Tag("positive")
+        @DisplayName("Получение бронирования")
+        void getBooking() {
+                BookingDTO bookingRequest = randomBooking(); // To garantee that in future check will be our booking,
+                                                             // not some other one, that could be saved in the system by
+                                                             // other tests or users
+                Response createResp = bookingApiClient.createBooking(bookingRequest);
+                assertThat(createResp.getStatusCode()).isEqualTo(200);
+
+                Integer bookingId = createResp.as(CreateBookingResponse.class).getBookingid();
+                Response getResponse = bookingApiClient.getBooking(bookingId);
+                assertThat(getResponse.getStatusCode()).isEqualTo(200);
+
+                BookingSteps.bookingsShouldBeEqual(createResp.as(CreateBookingResponse.class).getBooking(),
+                                bookingRequest);
+        }
+
+        @Test
+        @Tag("positive")
+        @DisplayName("Получение списка бронирований по фамилии")
+        void getBookingsByLastName() {
+                int bookingQuantity = 5;
+                String lastName = UUID.randomUUID().toString(); // Using a random uuid as last name to avoid conflicts
+                                                                // with existing bookings. Bad practice, because using
+                                                                // this last name would be forbidden in a real project
+
+                Integer[] bookingIds = generateBookings(bookingQuantity, lastName); // Using massive instead of List to
+                                                                                    // make test faster, because we know
+                                                                                    // the size of the array in advance
+                                                                                    // and don't need to resize it
+
+                Response resp = bookingApiClient.getBookings(Map.of("lastname", lastName));
+                assertThat(resp.getStatusCode()).isEqualTo(200);
+
+                BookingId[] bookings = resp.as(BookingId[].class);
+                BookingSteps.bookingListShouldBeValid(bookings, bookingIds, bookingQuantity);
         }
 
         private static Stream<Arguments> missingRequiredFields() {
+                BookingDTO withoutFirstname = randomBooking();
+                withoutFirstname.setFirstname(null);
+
+                BookingDTO withoutLastname = randomBooking();
+                withoutLastname.setLastname(null);
+
                 return Stream.of(
-                                Arguments.of(
-                                                validBookingBuilder().firstname(null).build()),
-                                Arguments.of(
-                                                validBookingBuilder().lastname(null).build()));
+                                Arguments.of(withoutFirstname),
+                                Arguments.of(withoutLastname));
         }
 
+        private Integer[] generateBookings(int bookingQuantity, String lastName) {
+                Integer[] bookingIds = new Integer[bookingQuantity];
+                for (int i = 0; i < bookingQuantity; i++) {
+                        BookingDTO bookingDTO = randomBooking();
+                        bookingDTO.setLastname(lastName);
+
+                        Integer bookingId = bookingSteps.createBooking(bookingDTO).getBookingid();
+                        bookingIds[i] = bookingId;
+
+                }
+                return bookingIds;
+        }
 }
