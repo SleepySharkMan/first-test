@@ -16,12 +16,12 @@ import io.qameta.allure.SeverityLevel;
 import net.datafaker.Faker;
 import webshop.pages.WSWelcomePage;
 
+@Tag ("UI")
 @Epic("Авторизация")
 @Feature("Регистрация")
 public class RegistrationTest extends TestBase {
     private static final Faker faker = new Faker();
 
-    @Tag("UI")
     @Tag("positive")
     @DisplayName("Успешная регистрация нового пользователя")
     @Severity(SeverityLevel.CRITICAL)

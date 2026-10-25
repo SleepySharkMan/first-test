@@ -85,6 +85,9 @@ task uiTest(type: Test) {
 }
 
 task apiTest(type: Test) {
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    
     useJUnitPlatform {
         def tag = System.getProperty("tag")
         if (tag != null && !tag.isBlank()) {

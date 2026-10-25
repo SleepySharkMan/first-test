@@ -28,11 +28,4 @@ public class BookingDTO {
         private String checkin;
         private String checkout;
     }
-
-    public BookingDTO(String firstname, int totalprice, String checkin) {
-        this.firstname = firstname;
-        this.totalprice = totalprice;
-        this.bookingdates = new BookingDates();
-        this.bookingdates.setCheckin(checkin);
-    }
 }
