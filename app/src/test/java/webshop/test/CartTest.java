@@ -19,6 +19,7 @@ import webshop.pages.WSDesktopPage;
 import webshop.pages.WSWelcomePage;
 import webshop.steps.AuthSteps;
 
+@Tag ("UI")
 public class CartTest extends TestBase {
     private final AuthSteps authSteps = new AuthSteps();
     private static final String PRODUCT_NAME = "Build your own cheap computer";
@@ -31,7 +32,6 @@ public class CartTest extends TestBase {
         authSteps.registerNewUser();
     }
 
-    @Tag("UI")
     @Tag("positive")
     @DisplayName("Успешное добавление компьюьтера в корзину")
     @Severity(SeverityLevel.CRITICAL)

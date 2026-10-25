@@ -1,5 +1,7 @@
 package booking.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateBookingDto {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class BookingDTO {
     private String firstname;
     private String lastname;
     private Integer totalprice;
